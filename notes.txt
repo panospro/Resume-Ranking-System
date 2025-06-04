@@ -1,0 +1,7 @@
+maybe -points for the ones that more than 1 page
+
+# For visualizations
+# TODO: Make it find the job title they have not with pre given jt 
+# TODO: Get tech skills and soft skills from future jd dataset
+
+# TODO: In the readme it could be nice to add graphs from analyze data or visualize dataset
