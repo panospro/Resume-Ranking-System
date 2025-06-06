@@ -13,6 +13,8 @@ def compute_skill_metrics(resume_text: str, jd_text: str, skills: List[str]) -> 
     resume_skills = extract_skills(resume_text, skills)
     jd_skills = extract_skills(jd_text, skills)
     overlap = resume_skills & jd_skills
+    
+    # resume and jd are for debugging purposes to see the skills extracted
     return {
         'resume': resume_skills,
         'jd': jd_skills,
