@@ -1,30 +1,32 @@
 import re
-from ..config import TECH_SKILLS
-from typing import Set
+from typing import Set, List, Tuple, Dict
+from ..config import TECH_SKILLS, SOFT_SKILLS
 
-# === Extract matching tech skills from a given text ===
-def extract_tech_skills(text: str, skill_list: list = TECH_SKILLS) -> set:
+# === Generic Skill Extractor ===
+def extract_skills(text: str, skills: List[str]) -> Set[str]:
     text = str(text).lower()
-    text = re.sub(r'[^\w\s.+#]', ' ', text)  # Remove non-skill special chars except dot, +, #
-    words = set(re.findall(r'\b[\w.+#]+\b', text))  # Keep things like c++, c#, node.js
-    return set(skill for skill in skill_list if skill.lower() in words)
+    text = re.sub(r'[^\w\s.+#]', ' ', text) # Remove non-skill special chars except dot, +, #
+    tokens = set(re.findall(r'\b[\w.+#]+\b', text)) # Keep things like c++, c#, node.js
+    return {skill for skill in skills if skill.lower() in tokens}
 
-# === Count how many JD skills are found in the resume ===
-def matching_skill_count(resume_text: str, jd_text: str) -> int:
-    resume_skills = extract_tech_skills(resume_text)
-    jd_skills = extract_tech_skills(jd_text)
-    return len(resume_skills & jd_skills)
+def compute_skill_metrics(resume_text: str, jd_text: str, skills: List[str]) -> dict:
+    resume_skills = extract_skills(resume_text, skills)
+    jd_skills = extract_skills(jd_text, skills)
+    overlap = resume_skills & jd_skills
+    return {
+        'resume': resume_skills,
+        'jd': jd_skills,
+        'overlap': overlap,
+        'count': len(overlap),
+        'coverage': len(overlap) / len(jd_skills) if jd_skills else 0.0
+    }
 
-# === Percentage of JD skills covered by resume ===
-def skill_coverage_ratio(resume_text: str, jd_text: str) -> float:
-    resume_skills = extract_tech_skills(resume_text)
-    jd_skills = extract_tech_skills(jd_text)
-    if not jd_skills:
-        return 0.0
-    return len(resume_skills & jd_skills) / len(jd_skills)
-
-# === Return actual overlapping skills as a set ===
-def tech_stack_overlap(resume_text: str, jd_text: str) -> Set[str]:
-    resume_skills = extract_tech_skills(resume_text)
-    jd_skills = extract_tech_skills(jd_text)
-    return resume_skills & jd_skills
+def get_skill_metrics(resume_text: str, jd_text: str) -> Tuple[Dict[str, any], Dict[str, any]]:
+    """
+    Returns:
+        tech_metrics: dict with resume skills/jd skills/overlap/count/coverage for TECH_SKILLS
+        soft_metrics: same structure for SOFT_SKILLS
+    """
+    tech_metrics = compute_skill_metrics(resume_text, jd_text, TECH_SKILLS)
+    soft_metrics = compute_skill_metrics(resume_text, jd_text, SOFT_SKILLS)
+    return tech_metrics, soft_metrics

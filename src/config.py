@@ -59,3 +59,11 @@ TECH_SKILLS = [
     # Tools & Productivity
     "jira", "confluence", "notion", "slack", "figma", "miro", "obsidian"
 ]
+
+SOFT_SKILLS = [
+    "communication", "teamwork", "collaboration", "leadership", "creativity",
+    "adaptability", "problem-solving", "time management", "empathy",
+    "conflict resolution", "critical thinking", "responsibility", "work ethic",
+    "interpersonal skills", "decision making", "negotiation", "patience", "resilience", "self-motivation", "attention to detail",
+    "initiative", "reliability", "multitasking", "stress management"
+]
