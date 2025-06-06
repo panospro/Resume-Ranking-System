@@ -18,3 +18,44 @@ EDU_RANK = {
     "Unknown": 0,
     "Not Specified": 0
 }
+
+TECH_SKILLS = [
+    # Programming Languages
+    "python", "java", "c++", "c#", "javascript", "typescript", "go", "rust", "ruby", "php", "swift", "kotlin", "r",
+
+    # Databases
+    "sql", "mysql", "postgresql", "sqlite", "mongodb", "redis", "dynamodb", "cassandra", "neo4j", "couchdb",
+
+    # Web Development
+    "html", "css", "sass", "react", "next.js", "angular", "vue", "nuxt.js", "svelte",
+    "node.js", "express", "nestjs", "fastify", "django", "flask", "fastapi", "laravel",
+
+    # DevOps & Infrastructure
+    "git", "github", "gitlab", "bitbucket", "docker", "kubernetes", "terraform", "ansible",
+    "vagrant", "jenkins", "circleci", "travisci", "azure devops",
+
+    # Cloud Platforms
+    "aws", "azure", "gcp", "heroku", "vercel", "netlify", "digitalocean",
+
+    # Machine Learning & Data
+    "tensorflow", "pytorch", "scikit-learn", "xgboost", "lightgbm", "pandas", "numpy", "matplotlib", "seaborn",
+    "nltk", "spacy", "opencv", "huggingface", "mlflow", "keras",
+
+    # Big Data & Processing
+    "hadoop", "spark", "dask", "kafka", "airflow", "snowflake", "databricks",
+
+    # Scripting & OS
+    "bash", "powershell", "linux", "zsh", "windows", "macos",
+
+    # Testing & QA
+    "pytest", "unittest", "jest", "mocha", "cypress", "selenium", "jmeter", "postman",
+
+    # Monitoring & Logging
+    "elasticsearch", "logstash", "kibana", "prometheus", "grafana", "datadog", "new relic", "sentry",
+
+    # BI & Analytics
+    "tableau", "powerbi", "looker", "superset", "metabase", "excel",
+
+    # Tools & Productivity
+    "jira", "confluence", "notion", "slack", "figma", "miro", "obsidian"
+]
