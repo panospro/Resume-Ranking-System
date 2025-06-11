@@ -1,6 +1,7 @@
 import pandas as pd
 from src.utils.education import satisfies_education_requirement
 from src.utils.skills import get_skill_metrics
+from src.utils.nlp import compute_bert_similarity
 
 def extract_features(row) -> dict:
     jd_text = str(row["Job Description"])
@@ -16,8 +17,9 @@ def extract_features(row) -> dict:
         "tech_skill_coverage_ratio": tech_metrics["coverage"],
         "soft_matching_skill_count": soft_metrics["count"],
         "soft_skill_coverage_ratio": soft_metrics["coverage"],
-        "tech_stack_overlap": len(tech_metrics["overlap"]),  # NOTE: For app use later
-        "soft_stack_overlap": len(soft_metrics["overlap"])  # NOTE: For app use later 
+        "tech_stack_overlap": tech_metrics["overlap"],  # NOTE: For app use later
+        "soft_stack_overlap": soft_metrics["overlap"],  # NOTE: For app use later 
+        "bert_similarity": compute_bert_similarity(jd_text, resume_text)
     }
 
 def extract_all_features(df: pd.DataFrame) -> pd.DataFrame:

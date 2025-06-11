@@ -7,7 +7,7 @@ import joblib
 
 def train_model(df: pd.DataFrame):
     print("📈 Training model...")
-    X = df.drop(columns=["JD_ID", "Resume_ID", "Label"])
+    X = df.drop(columns=["JD_ID", "Resume_ID", "Label", "tech_stack_overlap", "soft_stack_overlap"])
     y = df["Label"]
 
     X_train, X_test, y_train, y_test = train_test_split(
