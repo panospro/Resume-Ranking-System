@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer
 from pathlib import Path
-from helper import load_dataframe_from_env
+from helper import load_from_env
 
-JDDatasetPath = load_dataframe_from_env("JDDatasetPath")
+JDDatasetPath = load_from_env("JDDatasetPath")
 
 # --- Load & Prepare Dataset ---
 def load_and_prepare_dataset(path: Path) -> pd.DataFrame:

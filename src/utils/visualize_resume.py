@@ -1,9 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from helper import load_dataframe_from_env
+from helper import load_from_env
 
-ResumeDatasetPath = load_dataframe_from_env("ResumeDatasetPath")
+ResumeDatasetPath = load_from_env("ResumeDatasetPath")
 
 EDU_KEYWORDS = [
     "bachelor", "bachelors", "b.sc", "b.s", "b.tech", "be", "bca", "beng", "ba", "b.a",

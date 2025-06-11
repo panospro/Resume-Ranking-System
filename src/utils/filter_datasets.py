@@ -1,5 +1,5 @@
 import pandas as pd
-from helper import load_dataframe_from_env
+from helper import load_from_env
 
 TECH_CATEGORIES = [
     "Java Developer", "Python Developer", "Web Designing", "DevOps Engineer",
@@ -38,7 +38,7 @@ def clean_job_dataset(df: pd.DataFrame, min_words=100, max_words=1500) -> pd.Dat
 def main():
     # Clean resumes
     CLEANED_RESUME_PATH = "Cleaned_ResumeDataset.csv"
-    ResumeDatasetPath = load_dataframe_from_env("ResumeDatasetPath")
+    ResumeDatasetPath = load_from_env("ResumeDatasetPath")
     resume_df = pd.read_csv(ResumeDatasetPath)
     cleaned_resume_df = clean_resume_dataset(resume_df)
     cleaned_resume_df.to_csv(CLEANED_RESUME_PATH, index=False)
@@ -46,7 +46,7 @@ def main():
 
     # Clean jd
     CLEANED_JD_PATH = "Cleaned_ResumeDataset.csv"
-    JD_DATASET_PATH = load_dataframe_from_env("JDDatasetPath")
+    JD_DATASET_PATH = load_from_env("JDDatasetPath")
     job_df = pd.read_csv(JD_DATASET_PATH)
     cleaned_job_df = clean_job_dataset(job_df)
     cleaned_job_df.to_csv(CLEANED_JD_PATH, index=False)

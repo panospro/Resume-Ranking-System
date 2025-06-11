@@ -1,9 +1,9 @@
 import pandas as pd
 from collections import Counter
 import re
-from helper import load_dataframe_from_env
+from helper import load_from_env
 
-ResumeDatasetPath = load_dataframe_from_env("ResumeDatasetPath")
+ResumeDatasetPath = load_from_env("ResumeDatasetPath")
 
 def load_dataset(path: str) -> pd.DataFrame:
     """Load resume dataset from CSV."""

@@ -1,3 +1,5 @@
 .env
 *.pyc
 notes.txt
+Dataset/llm_prompts.jsonl
+Dataset/llm_raw_outputs.jsonl
