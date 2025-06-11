@@ -38,7 +38,9 @@ def extract_features(row) -> dict:
         "keyword_coverage_ratio": keywords["coverage_ratio"],    
 
         # How many times JD keywords appear overall in the resume, normalized by resume length
-        "keyword_frequency_density": keywords["frequency_density"]
+        "keyword_frequency_density": keywords["frequency_density"],
+
+        "tfidf_score": keywords["tfidf_score"],
     }
 
 def extract_all_features(df: pd.DataFrame) -> pd.DataFrame:

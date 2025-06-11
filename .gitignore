@@ -4,3 +4,5 @@ notes.txt
 Dataset/llm_prompts.jsonl
 Dataset/llm_raw_outputs.jsonl
 trained_model.pkl
+feature_df.parquet
+trash.py

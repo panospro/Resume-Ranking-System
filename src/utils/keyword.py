@@ -1,43 +1,73 @@
+import spacy
+from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem import PorterStemmer
 from src.config import TECH_SKILLS, SOFT_SKILLS
-import re 
 
 stemmer = PorterStemmer()
+nlp = spacy.load("en_core_web_sm", disable=["ner"])
 
-def tokenize(text: str) -> list:
-    return re.findall(r"\b[a-zA-Z]{3,}\b", text.lower())
+COMMON_VERBS = {"develop", "design", "implement", "build", "lead", "manage", "optimize", "analyze"}
+COMMON_TERMS = {"project", "system", "api", "pipeline", "database", "application"}
+ALLOWED_POS = {"NOUN", "VERB", "ADJ"}
 
-def extract_keywords(jd_text: str, top_n: int = 30) -> list:
-    COMMON_VERBS = ["develop", "design", "implement", "build", "lead", "manage", "optimize", "analyze"]
-    COMMON_TERMS = ["project", "system", "api", "pipeline", "database", "application"]
+def tokenize_with_spacy(text: str) -> list:
+    doc = nlp(text.lower())
+    return [
+        stemmer.stem(token.lemma_) 
+        for token in doc 
+        if not token.is_stop and token.is_alpha and token.pos_ in ALLOWED_POS
+    ]
 
-    tokens = tokenize(jd_text)
-    keywords = set()
+def extract_keywords_spacy(jd_text: str, top_n: int = 30) -> list:
+    tokens = tokenize_with_spacy(jd_text)
+    token_freq = {}
 
     for token in tokens:
-        if token in COMMON_VERBS or token in COMMON_TERMS or token in TECH_SKILLS or token in SOFT_SKILLS:
-            keywords.add(stemmer.stem(token))
+        if (
+            token in COMMON_VERBS or
+            token in COMMON_TERMS or
+            token in TECH_SKILLS or
+            token in SOFT_SKILLS
+        ):
+            token_freq[token] = token_freq.get(token, 0) + 1
 
-    return list(keywords)[:top_n]
+    sorted_keywords = sorted(token_freq.items(), key=lambda x: x[1], reverse=True)
+    return [kw for kw, _ in sorted_keywords[:top_n]]
+
+def compute_tfidf_scores(texts: list) -> dict:
+    vectorizer = TfidfVectorizer(tokenizer=tokenize_with_spacy)
+    tfidf_matrix = vectorizer.fit_transform(texts)
+    feature_names = vectorizer.get_feature_names_out()
+
+    # Only return scores for the first document (JD)
+    jd_vector = tfidf_matrix[0]
+    jd_tfidf_scores = dict(zip(feature_names, jd_vector.toarray()[0]))
+    return jd_tfidf_scores
 
 def compute_keyword_alignment(jd_text: str, resume_text: str) -> dict:
-    jd_keywords = extract_keywords(jd_text)
-    resume_tokens = tokenize(resume_text)
-    resume_stems = [stemmer.stem(w) for w in resume_tokens]
-
-    if not jd_keywords:
+    jd_keywords = extract_keywords_spacy(jd_text)
+    resume_tokens = tokenize_with_spacy(resume_text)
+    
+    if not jd_keywords or not resume_tokens:
         return {
             "coverage_ratio": 0.0,
-            "frequency_density": 0.0
+            "frequency_density": 0.0,
+            "tfidf_score": 0.0
         }
 
-    coverage_hits = sum(1 for kw in jd_keywords if kw in resume_stems)
-    total_mentions = sum(resume_stems.count(kw) for kw in jd_keywords)
+    # Compute basic metrics
+    coverage_hits = sum(1 for kw in jd_keywords if kw in resume_tokens)
+    total_mentions = sum(resume_tokens.count(kw) for kw in jd_keywords)
 
     coverage_ratio = coverage_hits / len(jd_keywords)
-    frequency_density = total_mentions / len(resume_stems) if resume_stems else 0.0
+    frequency_density = total_mentions / len(resume_tokens)
+
+    # TF-IDF score: use JD + resume as corpus
+    tfidf_scores = compute_tfidf_scores([jd_text, resume_text])
+    tfidf_score = sum(tfidf_scores.get(kw, 0.0) for kw in jd_keywords)
 
     return {
         "coverage_ratio": round(coverage_ratio, 4),
-        "frequency_density": round(frequency_density, 6)
+        "frequency_density": round(frequency_density, 6),
+        "tfidf_score": round(tfidf_score, 6)
     }
