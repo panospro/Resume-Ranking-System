@@ -1,6 +1,6 @@
 import re
 from typing import Set, List, Tuple, Dict
-from ..config import TECH_SKILLS, SOFT_SKILLS
+from src.config import TECH_SKILLS, SOFT_SKILLS
 
 # === Generic Skill Extractor ===
 def extract_skills(text: str, skills: List[str]) -> Set[str]:

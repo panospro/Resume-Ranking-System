@@ -1,5 +1,5 @@
 import re
-from config import EDUCATION_LEVELS, EDU_RANK
+from src.config import EDUCATION_LEVELS, EDU_RANK
 
 # === Core helper function to extract education level from any text ===
 # Uses regex to find explicit mentions and falls back to vague term matching
