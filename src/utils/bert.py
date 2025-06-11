@@ -12,7 +12,6 @@ def normalize(text: str) -> str:
     text = re.sub(r"\s+", " ", text)  # remove extra spaces/newlines
     return text.strip()
 
-# Best 
 def compute_bert_similarity(jd_text: str, resume_text: str) -> float:
     jd_text = normalize(jd_text)
     resume_text = normalize(resume_text)
