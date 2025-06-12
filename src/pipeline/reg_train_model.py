@@ -9,6 +9,9 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.linear_model import Ridge, Lasso
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
+from sklearn.utils import compute_sample_weight
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint, uniform
 
 # === Metrics ===
 def evaluate_model(y_true, y_pred, verbose=True):
@@ -86,33 +89,74 @@ def compare_models(X_train, X_test, y_train, y_test):
     print("\n📊 Model Comparison:")
     print(df_results.to_string(index=False))
 
+def tune_hyperparameters(X_train, y_train, n_iter=30, cv=3, random_state=42):
+    print("🔧 Running hyperparameter tuning with RandomizedSearchCV...")
+
+    xgb = XGBRegressor(objective='reg:squarederror', verbosity=0, random_state=random_state)
+
+    param_dist = {
+        'n_estimators': randint(100, 300),
+        'max_depth': randint(3, 10),
+        'learning_rate': uniform(0.01, 0.3),
+        'subsample': uniform(0.6, 0.4),
+        'colsample_bytree': uniform(0.6, 0.4),
+        'reg_alpha': uniform(0.0, 0.3),
+        'reg_lambda': uniform(0.5, 2.0)
+    }
+
+    weights = compute_sample_weight(class_weight='balanced', y=y_train)
+
+    search = RandomizedSearchCV(
+        xgb,
+        param_distributions=param_dist,
+        n_iter=n_iter,
+        scoring='r2',
+        cv=cv,
+        verbose=1,
+        n_jobs=-1,
+        random_state=random_state
+    )
+
+    search.fit(X_train, y_train, sample_weight=weights)
+
+    print(f"✅ Best R2: {search.best_score_:.4f}")
+    print(f"📦 Best Params: {search.best_params_}")
+    
+    return search.best_estimator_
+
+
 # === Model training ===
 def train_model(df: pd.DataFrame, save_path="trained_model.pkl"):
     print("📈 Training model with XGBoost...")
     
     # Feature setup
-    X = df.drop(columns=["JD_ID", "Resume_ID", "Label", "tech_stack_overlap", "soft_stack_overlap"])
-    y = df["Label"]
+    X = df.drop(columns=["JD_ID", "Resume_ID", "Label", "tech_stack_overlap", "soft_stack_overlap", "soft_matching_skill_count"])
+    y = df["Label"].astype(int).replace({3: 3, 4: 3})  # merge 3 & 4
 
     # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
+        X, y, test_size=0.2, random_state=42, stratify=y
     )
+
+    print(f"📦 Training samples: {X_train.shape[0]}")
+    print(f"🧪 Testing samples: {X_test.shape[0]}")
+    print(f"🔢 Total features: {X_train.shape[1]}")
+
 
     # Initialize and fit best model
-    model = XGBRegressor(
-        n_estimators=100,
-        max_depth=3,
-        learning_rate=0.1,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        reg_alpha=0.1,
-        reg_lambda=1.0,
-        verbosity=0
-    )
+    # model = XGBRegressor(
+    #     n_estimators=100,
+    #     max_depth=3,
+    #     learning_rate=0.1,
+    #     subsample=0.8,
+    #     colsample_bytree=0.8,
+    #     reg_alpha=0.1,
+    #     reg_lambda=1.0,
+    #     verbosity=0
+    # )
 
-    model.fit(X_train, y_train)
-
+    # Hyperparameter tuning
+    model = tune_hyperparameters(X_train, y_train)
     y_pred = model.predict(X_test)
 
     # Save model

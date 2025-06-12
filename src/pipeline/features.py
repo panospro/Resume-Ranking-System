@@ -21,18 +21,12 @@ def extract_features(row) -> dict:
         "tech_matching_skill_count": tech_metrics["count"],
         "soft_matching_skill_count": soft_metrics["count"],
         "bert_similarity": compute_bert_similarity(jd_text, resume_text),
-
-        # Helps answer: “Does this person cover what we asked for?”
         "tech_skill_coverage_ratio": tech_metrics["coverage"],
         "soft_skill_coverage_ratio": soft_metrics["coverage"],
 
         # NOTE: For app use later 
         "tech_stack_overlap": tech_metrics["overlap"],
         "soft_stack_overlap": soft_metrics["overlap"], 
-
-        # Helps answer: “Are the resume’s skills actually relevant to this job?”
-        "tech_skill_precision_ratio": tech_metrics["count"] / (len(tech_metrics["resume"]) + 1e-5),
-        "soft_skill_precision_ratio": soft_metrics["count"] / (len(soft_metrics["resume"]) + 1e-5),
 
         # What fraction of JD keywords are present at least once in the resume.
         "keyword_coverage_ratio": keywords["coverage_ratio"],    

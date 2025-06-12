@@ -1,6 +1,7 @@
 import pandas as pd
 from src.pipeline.features import extract_all_features
-from src.pipeline.train_model import train_model
+# from src.pipeline.reg_train_model import train_model
+from src.pipeline.clas_train_model import train_model
 from src.pipeline.pseudo_labeling import generate_labels
 from src.utils.helper import load_from_env
 from src.pipeline.feature_cleaning import clean_dataset, run_data_quality_checks
@@ -23,7 +24,7 @@ def load_data(jd_path, resume_path):
 
     return pair_df
 
-def main(skip_to_training=False):
+def main(skip_to_training=True):
     if skip_to_training:
         print("Loading pre-extracted features...")
         feature_df = pd.read_parquet("feature_df.parquet")
@@ -39,7 +40,6 @@ def main(skip_to_training=False):
         feature_df.to_parquet("feature_df.parquet")
 
     feature_df = clean_dataset(feature_df)  # Step 4
-
     # run_data_quality_checks(feature_df) # Step 5
     train_model(feature_df) # Step 6
 

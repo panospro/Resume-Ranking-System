@@ -91,8 +91,6 @@ def transform_skewed_features(df: pd.DataFrame) -> pd.DataFrame:
     # Apply log1p to features with values ≥ 0
     log_features = [
         "soft_skill_coverage_ratio",
-        "soft_skill_precision_ratio",
-        "tech_skill_precision_ratio",
         "tech_skill_coverage_ratio",
         "jd_length",
         "keyword_frequency_density"
