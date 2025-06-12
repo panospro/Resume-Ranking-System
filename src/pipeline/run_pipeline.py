@@ -1,7 +1,7 @@
 import pandas as pd
 from src.pipeline.features import extract_all_features
-# from src.pipeline.reg_train_model import train_model
-from src.pipeline.clas_train_model import train_model
+from src.pipeline.reg_train_model import train_model
+# from src.pipeline.clas_train_model import train_model
 from src.pipeline.pseudo_labeling import generate_labels
 from src.utils.helper import load_from_env
 from src.pipeline.feature_cleaning import clean_dataset, run_data_quality_checks
@@ -27,7 +27,7 @@ def load_data(jd_path, resume_path):
 def main(skip_to_training=True):
     if skip_to_training:
         print("Loading pre-extracted features...")
-        feature_df = pd.read_parquet("feature_df.parquet")
+        feature_df = pd.read_json("feature_df.jsonl", lines=True)
 
     else:
         RESUME_PATH = load_from_env("ResumeDatasetPath")
@@ -36,8 +36,8 @@ def main(skip_to_training=True):
         df = generate_labels(df)              # Step 2
         feature_df = extract_all_features(df) # Step 3
 
-        # Save to reuse
-        feature_df.to_parquet("feature_df.parquet")
+        # Save to JSONL (each row = 1 line of JSON)
+        feature_df.to_json("feature_df.jsonl", orient="records", lines=True)
 
     feature_df = clean_dataset(feature_df)  # Step 4
     # run_data_quality_checks(feature_df) # Step 5

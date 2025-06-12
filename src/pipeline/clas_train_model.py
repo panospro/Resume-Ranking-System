@@ -49,13 +49,7 @@ def train_model(df: pd.DataFrame, save_path="final_xgb_model.pkl"):
     # === Prepare features
     X = df.drop(columns=["JD_ID", "Resume_ID", "Label", "tech_stack_overlap", "soft_stack_overlap", "soft_matching_skill_count"], errors="ignore")
     X = X.select_dtypes(include=[np.number])
-    y = df["Label"].astype(int).replace({
-        0: 0,  # 0 stays 0
-        1: 0,  # merged into 0
-        2: 1,  # shifted to 1
-        3: 2,  # merged into 2
-        4: 2   # merged into 2
-    })
+    y = df["Label"].astype(int).replace({3: 3, 4: 3})  # merge 3 & 4
 
     # === Split
     X_train, X_test, y_train, y_test = train_test_split(

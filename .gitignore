@@ -6,3 +6,4 @@ Dataset/llm_raw_outputs.jsonl
 trained_model.pkl
 feature_df.parquet
 trash.py
+feature_df.jsonl

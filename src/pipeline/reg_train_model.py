@@ -124,7 +124,6 @@ def tune_hyperparameters(X_train, y_train, n_iter=30, cv=3, random_state=42):
     
     return search.best_estimator_
 
-
 # === Model training ===
 def train_model(df: pd.DataFrame, save_path="trained_model.pkl"):
     print("📈 Training model with XGBoost...")
@@ -142,19 +141,6 @@ def train_model(df: pd.DataFrame, save_path="trained_model.pkl"):
     print(f"🧪 Testing samples: {X_test.shape[0]}")
     print(f"🔢 Total features: {X_train.shape[1]}")
 
-
-    # Initialize and fit best model
-    # model = XGBRegressor(
-    #     n_estimators=100,
-    #     max_depth=3,
-    #     learning_rate=0.1,
-    #     subsample=0.8,
-    #     colsample_bytree=0.8,
-    #     reg_alpha=0.1,
-    #     reg_lambda=1.0,
-    #     verbosity=0
-    # )
-
     # Hyperparameter tuning
     model = tune_hyperparameters(X_train, y_train)
     y_pred = model.predict(X_test)
@@ -165,7 +151,7 @@ def train_model(df: pd.DataFrame, save_path="trained_model.pkl"):
 
     # Report + plots
     evaluate_model(y_test, y_pred)
-    plot_predictions(y_test, y_pred)
+    # plot_predictions(y_test, y_pred)
     plot_feature_importances(model, X.columns)
     plot_learning_curve(model, X, y)
 
