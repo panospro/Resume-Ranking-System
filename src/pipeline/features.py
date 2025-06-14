@@ -1,6 +1,6 @@
 import pandas as pd
 from src.utils.education import satisfies_education_requirement
-from src.utils.skills import get_skill_metrics, get_domain_term_overlap
+from src.utils.skills import get_skill_metrics, get_domain_term_overlap, get_responsibility_verb_overlap, get_seniority_alignment_score
 from src.utils.bert import compute_bert_similarity, compute_title_similarity, resume_contains_role_title
 from src.utils.keyword import compute_keyword_alignment
 from src.utils.sections import extract_structure_features
@@ -19,7 +19,9 @@ def extract_features(row) -> dict:
 
     # === Structure features ===
     structure = extract_structure_features(resume_text)
-    domain_metrics = get_domain_term_overlap(jd_text, resume_text)
+    domain_metrics = get_domain_term_overlap(resume_text, jd_text)
+    responsibility_verb = get_responsibility_verb_overlap(resume_text, jd_text)
+    seniority_alignment = get_seniority_alignment_score(resume_text, jd_text)
 
     return {
         "satisfies_education": satisfies_education_requirement(jd_text, resume_text),
@@ -50,6 +52,10 @@ def extract_features(row) -> dict:
         "resume_contains_role_title": resume_contains_role_title(jd_title, resume_text),
         "domain_term_overlap_count": domain_metrics["domain_term_overlap_count"],
         "domain_term_overlap_ratio": domain_metrics["domain_term_overlap_ratio"],
+        "responsibility_verb_overlap_count": responsibility_verb["responsibility_verb_overlap_count"],
+        "responsibility_verb_overlap_ratio": responsibility_verb["responsibility_verb_overlap_ratio"],
+        "seniority_alignment_count": seniority_alignment["seniority_alignment_count"],
+        "seniority_alignment_ratio": seniority_alignment["seniority_alignment_ratio"],
     }
 
 def extract_all_features(df: pd.DataFrame) -> pd.DataFrame:

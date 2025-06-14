@@ -1,6 +1,6 @@
 import re
 from typing import Set, List, Tuple, Dict
-from src.config import TECH_SKILLS, SOFT_SKILLS, DOMAIN_KEYWORDS
+from src.config import TECH_SKILLS, SOFT_SKILLS, DOMAIN_KEYWORDS, RESPONSIBILITY_VERBS, SENIORITY_TERMS
 
 # === Generic Skill Extractor ===
 def extract_skills(text: str, skills: List[str]) -> Set[str]:
@@ -39,7 +39,7 @@ def extract_tokens(text: str) -> Set[str]:
     text = re.sub(r'[^\w\s.+#]', ' ', text)
     return set(re.findall(r'\b[\w.+#]+\b', text))
 
-def get_domain_term_overlap(jd_text: str, resume_text: str) -> Dict[str, float]:
+def get_domain_term_overlap(resume_text: str, jd_text: str) -> Dict[str, float]:
     """
     Computes domain term overlap by checking which domain's keywords are mentioned in both JD and Resume.
     Returns:
@@ -71,4 +71,48 @@ def get_domain_term_overlap(jd_text: str, resume_text: str) -> Dict[str, float]:
     return {
         "domain_term_overlap_count": max_count,
         "domain_term_overlap_ratio": round(max_ratio, 4)
+    }
+
+def get_responsibility_verb_overlap(resume_text: str, jd_text: str) -> Dict[str, float]:
+    """
+    Measures overlap of action/responsibility verbs between resume and job description.
+    Returns:
+        {
+            'responsibility_verb_overlap_count': int,
+            'responsibility_verb_overlap_ratio': float
+        }
+    """
+    resume_tokens = extract_tokens(resume_text)
+    jd_tokens = extract_tokens(jd_text)
+
+    resume_verbs = {word for word in resume_tokens if word in RESPONSIBILITY_VERBS}
+    jd_verbs = {word for word in jd_tokens if word in RESPONSIBILITY_VERBS}
+
+    overlap = resume_verbs & jd_verbs
+
+    return {
+        'responsibility_verb_overlap_count': len(overlap),
+        'responsibility_verb_overlap_ratio': len(overlap) / len(jd_verbs) if jd_verbs else 0.0
+    }
+
+def get_seniority_alignment_score(resume_text: str, jd_text: str) -> Dict[str, float]:
+    """
+    Measures the overlap of seniority-level terms between JD and resume.
+    Returns:
+        {
+            'seniority_alignment_count': int,
+            'seniority_alignment_ratio': float
+        }
+    """
+    resume_tokens = extract_tokens(resume_text)
+    jd_tokens = extract_tokens(jd_text)
+
+    resume_senior_terms = {term for term in SENIORITY_TERMS if term in resume_tokens}
+    jd_senior_terms = {term for term in SENIORITY_TERMS if term in jd_tokens}
+
+    overlap = resume_senior_terms & jd_senior_terms
+
+    return {
+        'seniority_alignment_count': len(overlap),
+        'seniority_alignment_ratio': len(overlap) / len(jd_senior_terms) if jd_senior_terms else 0.0
     }

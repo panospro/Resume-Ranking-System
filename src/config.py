@@ -75,3 +75,17 @@ DOMAIN_KEYWORDS = {
     "ecommerce": ["shopping cart", "order management", "inventory", "checkout", "loyalty program"],
     "education": ["learning management", "edtech", "moodle", "student portal", "e-learning"],
 }
+
+RESPONSIBILITY_VERBS = {
+    'led', 'managed', 'developed', 'designed', 'built', 'implemented',
+    'created', 'executed', 'delivered', 'launched', 'improved', 'optimized',
+    'collaborated', 'directed', 'initiated', 'analyzed', 'oversaw', 'coordinated',
+    'architected', 'refactored', 'streamlined', 'owned', 'deployed', 'based', 'completed', 'design',
+    'involved', 'used', 'worked'
+}
+
+SENIORITY_TERMS = {
+    'intern', 'junior', 'mid-level', 'midlevel', 'senior',
+    'lead', 'principal', 'staff', 'entry-level', 'associate',
+    'manager', 'director', 'vp', 'chief', 'head', 'executive'
+}
