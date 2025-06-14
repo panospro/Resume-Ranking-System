@@ -50,23 +50,22 @@ def save_prompts_jsonl(df: pd.DataFrame):
 
 def generate_labels(df: pd.DataFrame) -> pd.DataFrame:
     # === Only use this if you want to regenerate prompts ===
-    df = create_prompts(df)
-    save_prompts_jsonl(df)
+    # df = create_prompts(df)
+    # save_prompts_jsonl(df)
 
     # === Load prompts directly from existing JSONL ===
-    # print("📂 Loading prompts from existing file...")
-    # prompts = []
-    # with open("Dataset/llm_prompts.jsonl", "r", encoding="utf-8") as f:
-    #     for line in f:
-    #         try:
-    #             item = json.loads(line)
-    #             prompts.append(item)
-    #         except:
-    #             continue
-    # prompt_df = pd.DataFrame(prompts)
-
-    # # Merge with full df to allow feature processing later
-    # df = pd.merge(df, prompt_df, on=["JD_ID", "Resume_ID"], how="inner")
+    print("📂 Loading prompts from existing file...")
+    prompts = []
+    with open("Dataset/llm_prompts.jsonl", "r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                item = json.loads(line)
+                prompts.append(item)
+            except:
+                continue
+    prompt_df = pd.DataFrame(prompts)
+    df = pd.merge(df, prompt_df, on=["JD_ID", "Resume_ID"], how="inner")
+    # ========================
 
     # === Load completed responses if they exist ===
     seen_pairs = set()
