@@ -67,3 +67,11 @@ SOFT_SKILLS = [
     "interpersonal skills", "decision making", "negotiation", "patience", "resilience", "self-motivation", "attention to detail",
     "initiative", "reliability", "multitasking", "stress management"
 ]
+
+DOMAIN_KEYWORDS = {
+    "fintech": ["banking", "trading", "finance", "payment gateway", "blockchain", "risk modeling"],
+    "cloud": ["aws", "azure", "gcp", "cloud infrastructure", "kubernetes", "devops"],
+    "biotech": ["genomics", "drug discovery", "clinical trials", "bioinformatics", "protein", "pharma"],
+    "ecommerce": ["shopping cart", "order management", "inventory", "checkout", "loyalty program"],
+    "education": ["learning management", "edtech", "moodle", "student portal", "e-learning"],
+}

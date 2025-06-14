@@ -1,10 +1,10 @@
 import re
 
-def extract_section_headers(text):
+def extract_structure_features(text: str) -> dict:
     text = text.lower().replace('\r', '\n')
     headers = set()
 
-    # Fuzzy match against soft section labels
+    # --- Section headers detection ---
     soft_patterns = {
         "projects": r"\b(projects|project experience|project details)\b",
         "certifications": r"\b(certifications|certification|certified)\b",
@@ -17,13 +17,25 @@ def extract_section_headers(text):
         if re.search(pattern, text):
             headers.add(section)
 
-    return headers
+    # --- Cover letter detection ---
+    cover_letter_patterns = [
+        r"dear (hiring manager|recruiter|sir|madam|team)",
+        r"i am writing (to apply|in response|this letter)",
+        r"please find (my resume|attached)",
+        r"i am excited (to apply|about this opportunity)",
+        r"my name is .* and i am (interested|applying)",
+        r"with great enthusiasm",
+        r"this letter is in regard to",
+        r"i am reaching out",
+        r"i would like to express",
+        r"i am submitting my application",
+    ]
 
-def has_projects_section(text):
-    return int("projects" in extract_section_headers(text))
+    has_cover_letter = any(re.search(pattern, text) for pattern in cover_letter_patterns)
 
-def has_certifications_section(text):
-    return int("certifications" in extract_section_headers(text))
-
-def num_sections(text):
-    return len(extract_section_headers(text))
+    return {
+        "has_projects_section": int("projects" in headers),
+        "has_certifications_section": int("certifications" in headers),
+        "num_sections": len(headers),
+        "has_cover_letter": int(has_cover_letter)
+    }
