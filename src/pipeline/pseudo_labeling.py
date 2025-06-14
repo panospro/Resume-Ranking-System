@@ -7,21 +7,37 @@ from pathlib import Path
 PROMPT_JSONL = "Dataset/llm_prompts.jsonl"
 RESPONSE_JSONL = "Dataset/llm_raw_outputs.jsonl"
 
-client = OpenAI(
-    api_key=load_from_env("groqKey"),
-    base_url="https://api.groq.com/openai/v1"
-)
+api_index = 0
+
+# Combine keys with base URL and model name
+api_credentials = [
+    {"api_key": load_from_env("groqKey1"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
+    {"api_key": load_from_env("groqKey2"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
+    {"api_key": load_from_env("groqKey3"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
+    {"api_key": load_from_env("togetherKey1"), "base_url": "https://api.together.xyz/v1", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"},
+    {"api_key": load_from_env("togetherKey2"), "base_url": "https://api.together.xyz/v1", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"},
+    {"api_key": load_from_env("togetherKey3"), "base_url": "https://api.together.xyz/v1", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"},
+]
 
 def call_groq(prompt: str) -> str:
+    global api_index
+    creds = api_credentials[api_index]
+    api_index = (api_index + 1) % len(api_credentials)  # rotate key
+
+    client = OpenAI(
+        api_key=creds["api_key"],
+        base_url=creds["base_url"]
+    )
+
     try:
         response = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model=creds["model"],
             messages=[
                 {"role": "system", "content": "Rate how well a resume matches a job description on a scale of 0 to 5."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
-            max_tokens=10,
+            max_tokens=8,
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
