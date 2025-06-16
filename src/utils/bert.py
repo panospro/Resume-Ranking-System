@@ -1,11 +1,13 @@
+import re
+import numpy as np
 from sentence_transformers import SentenceTransformer
 from rapidfuzz import fuzz
-import numpy as np
-import re
+import torch
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
-from sentence_transformers import SentenceTransformer
-print(SentenceTransformer("all-MiniLM-L6-v2").device)
+# Detect CUDA if available
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+model = SentenceTransformer("all-MiniLM-L6-v2", device=DEVICE)
+print("SentenceTransformer running on:", DEVICE)
 
 def normalize(text: str) -> str:
     text = text.lower()
@@ -13,12 +15,14 @@ def normalize(text: str) -> str:
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
-def normalize_and_truncate(text: str, max_words: int = 750) -> str:
-    text = normalize(text)
-    words = text.split()
-    return " ".join(words[:max_words])
+def truncate_to_token_limit(text: str, max_words: int = 300) -> str:
+    return " ".join(text.split()[:max_words])
 
-def batch_compute_embeddings(texts: list[str], batch_size: int = 256) -> np.ndarray:
+def normalize_and_truncate(text: str, max_words: int = 300) -> str:
+    text = normalize(text)
+    return truncate_to_token_limit(text, max_words)
+
+def batch_compute_embeddings(texts: list[str], batch_size: int = 128) -> np.ndarray:
     texts = [normalize_and_truncate(t) for t in texts]
     return model.encode(texts, batch_size=batch_size, show_progress_bar=True, convert_to_numpy=True)
 
@@ -30,9 +34,7 @@ def fast_cosine_sim(vec1: np.ndarray, vec2: np.ndarray) -> float:
     return float(np.dot(vec1, vec2) / (norm1 * norm2))
 
 def normalize_title(text: str) -> str:
-    text = text.lower()
-    text = re.sub(r"[^a-z\s]", "", text)
-    return text.strip()
+    return re.sub(r"[^a-z\s]", "", text.lower()).strip()
 
 def compute_title_similarity(jd_title: str, resume_category: str) -> float:
     jd_title = normalize_title(jd_title)
@@ -42,5 +44,4 @@ def compute_title_similarity(jd_title: str, resume_category: str) -> float:
 def resume_contains_role_title(job_title: str, resume_text: str) -> int:
     job_title = str(job_title).lower().strip()
     resume_text = str(resume_text).lower()
-    score = fuzz.partial_ratio(job_title, resume_text)
-    return int(score >= 80)
+    return int(fuzz.partial_ratio(job_title, resume_text) >= 80)
