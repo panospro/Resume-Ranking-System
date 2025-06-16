@@ -14,9 +14,9 @@ MAX_CONCURRENT = 5  # Control concurrency
 
 # Round-robin across API keys
 api_credentials = [
-    {"api_key": load_from_env("groqKey1"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
-    {"api_key": load_from_env("groqKey2"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
-    {"api_key": load_from_env("groqKey3"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
+    # {"api_key": load_from_env("groqKey1"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
+    # {"api_key": load_from_env("groqKey2"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
+    # {"api_key": load_from_env("groqKey3"), "base_url": "https://api.groq.com/openai/v1", "model": "llama3-8b-8192"},
     {"api_key": load_from_env("togetherKey1"), "base_url": "https://api.together.xyz/v1", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"},
     {"api_key": load_from_env("togetherKey2"), "base_url": "https://api.together.xyz/v1", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"},
     {"api_key": load_from_env("togetherKey3"), "base_url": "https://api.together.xyz/v1", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"},
@@ -31,7 +31,7 @@ def extract_score(resp: str):
             return int(token)
     return None
 
-def call_llm(prompt: str, max_retries: int = 3) -> str:
+def call_llm(prompt: str, max_retries: int = 6) -> str:
     global api_index
     for attempt in range(max_retries):
         creds = api_credentials[api_index]
@@ -75,10 +75,13 @@ async def call_and_write(row, sem, executor, outfile_path):
             "Label": label
         }
 
-        async with aiofiles.open(outfile_path, "a", encoding="utf-8") as f:
-            await f.write(json.dumps(record) + "\n")
+        if label is not None:
+            async with aiofiles.open(outfile_path, "a", encoding="utf-8") as f:
+                await f.write(json.dumps(record) + "\n")
+            print(f"✅ JD: {row['JD_ID']} | Resume: {row['Resume_ID']} | Label: {label}")
+        else:
+            print(f"⛔ JD: {row['JD_ID']} | Resume: {row['Resume_ID']} | Skipped due to null label")
 
-        print(f"✅ JD: {row['JD_ID']} | Resume: {row['Resume_ID']} | Label: {label}")
         return record
 
 def generate_labels(df: pd.DataFrame) -> pd.DataFrame:

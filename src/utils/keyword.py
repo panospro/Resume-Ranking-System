@@ -10,6 +10,7 @@ COMMON_VERBS = {"develop", "design", "implement", "build", "lead", "manage", "op
 COMMON_TERMS = {"project", "system", "api", "pipeline", "database", "application"}
 ALLOWED_POS = {"NOUN", "VERB", "ADJ"}
 
+# === TOKENIZATION ===
 def tokenize_with_spacy(text: str) -> list:
     doc = nlp(text.lower())
     return [
@@ -18,10 +19,9 @@ def tokenize_with_spacy(text: str) -> list:
         if not token.is_stop and token.is_alpha and token.pos_ in ALLOWED_POS
     ]
 
-def extract_keywords_spacy(jd_text: str, top_n: int = 30) -> list:
-    tokens = tokenize_with_spacy(jd_text)
+# === KEYWORD EXTRACTION ===
+def extract_keywords_from_tokens(tokens: list, top_n: int = 30) -> list:
     token_freq = {}
-
     for token in tokens:
         if (
             token in COMMON_VERBS or
@@ -34,36 +34,39 @@ def extract_keywords_spacy(jd_text: str, top_n: int = 30) -> list:
     sorted_keywords = sorted(token_freq.items(), key=lambda x: x[1], reverse=True)
     return [kw for kw, _ in sorted_keywords[:top_n]]
 
-def compute_tfidf_scores(texts: list) -> dict:
-    vectorizer = TfidfVectorizer(tokenizer=tokenize_with_spacy)
+# === TF-IDF BINARY WRAPPER ===
+def compute_tfidf_scores(jd_tokens: list, resume_tokens: list) -> dict:
+    texts = [' '.join(jd_tokens), ' '.join(resume_tokens)]
+    vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(texts)
     feature_names = vectorizer.get_feature_names_out()
-
-    # Only return scores for the first document (JD)
     jd_vector = tfidf_matrix[0]
-    jd_tfidf_scores = dict(zip(feature_names, jd_vector.toarray()[0]))
-    return jd_tfidf_scores
+    return dict(zip(feature_names, jd_vector.toarray()[0]))
 
-def compute_keyword_alignment(jd_text: str, resume_text: str) -> dict:
-    jd_keywords = extract_keywords_spacy(jd_text)
-    resume_tokens = tokenize_with_spacy(resume_text)
-    
-    if not jd_keywords or not resume_tokens:
+# === MAIN ENTRYPOINT ===
+def compute_keyword_alignment(jd_text: str, resume_text: str,
+                              jd_tokens=None, resume_tokens=None) -> dict:
+    jd_tokens = jd_tokens or tokenize_with_spacy(jd_text)
+    resume_tokens = resume_tokens or tokenize_with_spacy(resume_text)
+
+    if not jd_tokens or not resume_tokens:
         return {
             "coverage_ratio": 0.0,
             "frequency_density": 0.0,
             "tfidf_score": 0.0
         }
 
-    # Compute basic metrics
+    jd_keywords = extract_keywords_from_tokens(jd_tokens)
+
+    # === Coverage + Frequency ===
     coverage_hits = sum(1 for kw in jd_keywords if kw in resume_tokens)
     total_mentions = sum(resume_tokens.count(kw) for kw in jd_keywords)
 
     coverage_ratio = coverage_hits / len(jd_keywords)
     frequency_density = total_mentions / len(resume_tokens)
 
-    # TF-IDF score: use JD + resume as corpus
-    tfidf_scores = compute_tfidf_scores([jd_text, resume_text])
+    # === TF-IDF Score ===
+    tfidf_scores = compute_tfidf_scores(jd_tokens, resume_tokens)
     tfidf_score = sum(tfidf_scores.get(kw, 0.0) for kw in jd_keywords)
 
     return {
