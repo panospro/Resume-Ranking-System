@@ -135,6 +135,9 @@ def generate_labels(df: pd.DataFrame, skip_labels: bool = False) -> pd.DataFrame
         response_df = pd.DataFrame(results)
         merged = pd.merge(df, response_df[["JD_ID", "Resume_ID", "Label"]], on=["JD_ID", "Resume_ID"], how="left")
         print("🏷️ Labels extracted and merged.")
-        return merged
+
+        # ✅ Filter only labeled rows
+        labeled_df = merged[merged["Label"].notnull()]
+        return labeled_df
 
     return asyncio.run(_run())

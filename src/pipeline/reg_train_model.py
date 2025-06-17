@@ -130,7 +130,7 @@ def train_model(df: pd.DataFrame, save_path="trained_model.pkl"):
     
     # Feature setup
     X = df.drop(columns=["JD_ID", "Resume_ID", "Label", "tech_stack_overlap", "soft_stack_overlap", "soft_matching_skill_count"])
-    y = df["Label"].astype(int).replace({3: 3, 4: 3})  # merge 3 & 4
+    y = df["Label"].astype(int).replace({3: 3, 4: 3, 5: 4})  # merge 3 & 4
 
     # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(

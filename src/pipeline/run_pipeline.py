@@ -1,7 +1,7 @@
 import pandas as pd
 from src.pipeline.features import extract_all_features
-from src.pipeline.reg_train_model import train_model
-# from src.pipeline.clas_train_model import train_model
+# from src.pipeline.reg_train_model import train_model
+from src.pipeline.clas_train_model import train_model
 from src.pipeline.pseudo_labeling import generate_labels
 from src.utils.helper import load_from_env
 from src.pipeline.feature_cleaning import clean_dataset, run_data_quality_checks
@@ -25,7 +25,7 @@ def load_data(jd_path, resume_path):
     return pair_df
 
 def main():
-    skip_to_training = False
+    skip_to_training = True
     skip_labels = True
     use_colab_bert = True
 
@@ -44,9 +44,9 @@ def main():
         feature_df = extract_all_features(df, use_colab_bert) # Step 3, true uses colab_bert
         feature_df.to_json("feature_df.jsonl", orient="records", lines=True)
 
-    # feature_df = clean_dataset(feature_df)  # Step 4
+    feature_df = clean_dataset(feature_df)  # Step 4
     # run_data_quality_checks(feature_df) # Step 5
-    # train_model(feature_df) # Step 6
+    train_model(feature_df) # Step 6
 
 if __name__ == "__main__":
     main()

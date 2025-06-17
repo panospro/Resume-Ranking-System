@@ -113,7 +113,9 @@ def transform_skewed_features(df: pd.DataFrame) -> pd.DataFrame:
 def drop_extreme_outliers(df: pd.DataFrame, numeric_cols: list, z_thresh: float = 3.0) -> pd.DataFrame:
     df = df.copy()
     z_scores = np.abs(zscore(df[numeric_cols]))
-    mask = (z_scores < z_thresh).all(axis=1)
+    row_outlier_counts = (z_scores > z_thresh).sum(axis=1)
+    mask = row_outlier_counts <= 3  # keep rows with ≤ 3 extreme features
+
     dropped_count = (~mask).sum()
     print(f"🧹 Dropping {dropped_count} rows with extreme outliers (z > {z_thresh})")
     return df[mask]
