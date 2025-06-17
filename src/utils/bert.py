@@ -4,11 +4,6 @@ from sentence_transformers import SentenceTransformer
 from rapidfuzz import fuzz
 import torch
 
-# Detect CUDA if available
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-model = SentenceTransformer("all-MiniLM-L6-v2", device=DEVICE)
-print("SentenceTransformer running on:", DEVICE)
-
 def normalize(text: str) -> str:
     text = text.lower()
     text = re.sub(r"[^\w\s]", "", text)
@@ -23,6 +18,10 @@ def normalize_and_truncate(text: str, max_words: int = 300) -> str:
     return truncate_to_token_limit(text, max_words)
 
 def batch_compute_embeddings(texts: list[str], batch_size: int = 128) -> np.ndarray:
+    # Detect CUDA if available
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+    model = SentenceTransformer("all-MiniLM-L6-v2", device=DEVICE)
+    print("SentenceTransformer running on:", DEVICE)
     texts = [normalize_and_truncate(t) for t in texts]
     return model.encode(texts, batch_size=batch_size, show_progress_bar=True, convert_to_numpy=True)
 

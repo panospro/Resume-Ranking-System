@@ -84,7 +84,7 @@ async def call_and_write(row, sem, executor, outfile_path):
 
         return record
 
-def generate_labels(df: pd.DataFrame) -> pd.DataFrame:
+def generate_labels(df: pd.DataFrame, skip_labels: bool = False) -> pd.DataFrame:
     async def _run():
         # === Only use this if you want to regenerate prompts ===
         # df = create_prompts(df)
@@ -118,11 +118,13 @@ def generate_labels(df: pd.DataFrame) -> pd.DataFrame:
         executor = ThreadPoolExecutor(max_workers=MAX_CONCURRENT)
 
         tasks = []
-        for _, row in df_prompted.iterrows():
-            key = (row["JD_ID"], row["Resume_ID"])
-            if key in seen_pairs:
-                continue
-            tasks.append(call_and_write(row, sem, executor, RESPONSE_JSONL))
+
+        if not skip_labels:
+            for _, row in df_prompted.iterrows():
+                key = (row["JD_ID"], row["Resume_ID"])
+                if key in seen_pairs:
+                    continue
+                tasks.append(call_and_write(row, sem, executor, RESPONSE_JSONL))
 
         await asyncio.gather(*tasks)
 
