@@ -91,3 +91,16 @@ Designed for integration into career platforms, ATS systems, or resume feedback 
 
 ---
 
+## 📌 Future Work
+
+- [ ] Add SHAP-based feature attribution
+- [ ] FastAPI app with resume/job upload
+- [ ] PDF & LinkedIn parser
+- [ ] Resume improvement tips via LLM
+
+---
+
+## 🤝 Contributions
+
+Interested in NLP, recommender systems, or explainable ML?  
+Feel free to fork, contribute, or get in touch!
